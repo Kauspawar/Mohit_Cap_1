@@ -186,7 +186,20 @@ with tab1:
                     disabled    = (input_mode == "Load Sample")
                     with gcols[i % 2]:
                         if feat in ['TypeOfSteel_A300','TypeOfSteel_A400']:
-                            user_inputs[feat] = float(st.selectbox(feat, [0,1], index=int(default_val), disabled=disabled))
+                            if disabled:
+                                # Avoid StreamlitAPIException: show read-only display when sample is loaded
+                                st.markdown(
+                                    f'<div style="font-family:\'Share Tech Mono\',monospace;font-size:0.75rem;'
+                                    f'color:#64748b;padding:6px 0;">{feat}</div>'
+                                    f'<div style="font-family:\'Rajdhani\',sans-serif;font-size:1rem;font-weight:600;'
+                                    f'color:#00d4ff;border:1px solid #1e2d45;border-radius:4px;padding:8px 12px;'
+                                    f'margin-bottom:8px;background:#161d2e;">{int(default_val)}</div>',
+                                    unsafe_allow_html=True
+                                )
+                                user_inputs[feat] = default_val
+                            else:
+                                safe_idx = int(default_val) if int(default_val) in [0, 1] else 0
+                                user_inputs[feat] = float(st.selectbox(feat, [0, 1], index=safe_idx))
                         else:
                             user_inputs[feat] = st.number_input(feat, value=default_val, format="%.4f", disabled=disabled)
 
